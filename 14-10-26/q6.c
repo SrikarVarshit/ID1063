@@ -10,13 +10,15 @@ struct Polynomial
 int main()
 {
     struct Polynomial poly, deriv;
-    double x, value = 0;
+    struct Polynomial *p = &poly;
+    struct Polynomial *d = &deriv;
+    double x, value;
     int i;
 
-    printf("Enter degree of polynomial (0-20): ");
-    scanf("%d", &poly.n);
+    printf("Enter degree (0-20): ");
+    scanf("%d", &p->n);
 
-    if (poly.n < 0 || poly.n > 20)
+    if (p->n < 0 || p->n > 20)
     {
         printf("Invalid degree\n");
         return 1;
@@ -24,57 +26,41 @@ int main()
 
     printf("Enter coefficients from a0 to an:\n");
 
-    for (i = 0; i <= poly.n; i++)
+    for (i = 0; i <= p->n; i++)
     {
         printf("a%d = ", i);
-        scanf("%lf", &poly.a[i]);
+        scanf("%lf", p->a + i);
     }
 
-    printf("Enter value of x (a): ");
+    printf("Enter value of x: ");
     scanf("%lf", &x);
 
-    // Compute P(x) using Horner's method
-    value = poly.a[poly.n];
+    // Evaluate P(x) using Horner's method
+    value = *(p->a + p->n);
 
-    for (i = poly.n - 1; i >= 0; i--)
-        value = value * x + poly.a[i];
+    for (i = p->n - 1; i >= 0; i--)
+        value = value * x + *(p->a + i);
 
     printf("P(%.2lf) = %.2lf\n", x, value);
 
-    // Compute derivative polynomial
-    deriv.n = (poly.n > 0) ? poly.n - 1 : 0;
-
-    if (poly.n > 0)
+    // Calculate derivative coefficients
+    if (p->n == 0)
     {
-        for (i = 1; i <= poly.n; i++)
-            deriv.a[i - 1] = i * poly.a[i];
+        d->n = 0;
+        *d->a = 0;
     }
     else
     {
-        deriv.a[0] = 0;
+        d->n = p->n - 1;
+
+        for (i = 1; i <= p->n; i++)
+            *(d->a + i - 1) = i * *(p->a + i);
     }
 
-    printf("Derivative: ");
+    printf("Coefficients afte Differentiation:\n");
 
-    if (poly.n == 0)
-    {
-        printf("0\n");
-    }
-    else
-    {
-        for (i = 0; i <= deriv.n; i++)
-        {
-            printf("%.2lf", deriv.a[i]);
-
-            if (i > 0)
-                printf("x^%d", i);
-
-            if (i < deriv.n)
-                printf(" + ");
-        }
-
-        printf("\n");
-    }
+    for (i = 0; i <= d->n; i++)
+        printf("a%d = %.2lf\n", i, *(d->a + i));
 
     return 0;
 }
